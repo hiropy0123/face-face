@@ -8,5 +8,7 @@ Pillow==10.4.0
 numpy==1.26.4
 pandas==2.2.3
 insightface==0.7.3
+onnx==1.16.2
 onnxruntime==1.19.2
 mediapipe>=0.10.14
+plotly>=5.18.0
