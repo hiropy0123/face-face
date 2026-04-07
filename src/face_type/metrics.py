@@ -94,7 +94,9 @@ def extract_metrics(landmarks: list, img_w: int, img_h: int) -> FaceMetrics:
     eye_center_y = (left_eye_center[1] + right_eye_center[1]) / 2
     eye_position_ratio = (eye_center_y - forehead[1]) / face_height if face_height > 0 else 0.5
     forehead_ratio     = eye_position_ratio
-    lower_face_ratio   = (chin[1] - eye_center_y) / face_height if face_height > 0 else 0.5
+    # 下顔面比: 鼻先〜顎先 / 顔高さ（三分割法の下顔面に対応、典型値 0.28〜0.40）
+    nose_tip_pt        = pt(LANDMARKS["nose_tip"])
+    lower_face_ratio   = (chin[1] - nose_tip_pt[1]) / face_height if face_height > 0 else 0.33
 
     left_eye_w  = _dist(pt(LANDMARKS["left_eye_inner"]),  pt(LANDMARKS["left_eye_outer"]))
     left_eye_h  = _dist(pt(LANDMARKS["left_eye_top"]),    pt(LANDMARKS["left_eye_bottom"]))
