@@ -61,14 +61,24 @@ def draw_landmarks_on_image(
 
 
 def create_radar_chart(metrics: FaceMetrics) -> go.Figure:
-    categories = ["縦横比", "目の大きさ", "目の丸み", "顎の鋭さ", "輪郭の丸み", "眉の曲率"]
+    """特徴量レーダーチャートを描画する.
+
+    各軸のスケールは日本人統計基準:
+    - 縦横比   : 1.25〜1.55 を 0〜1 にマップ (日本人平均 ~1.40)
+    - 目の大きさ: 0.15〜0.27 を 0〜1 にマップ (日本人平均 ~0.20)
+    - 目の丸み  : 0.14〜0.38 を 0〜1 にマップ (日本人平均 ~0.24)
+    - 顎の鋭さ  : 112〜132° を逆スケール    (日本人平均 ~120°)
+    - 輪郭の丸み: 0.60〜0.90 を 0〜1 にマップ (日本人平均 ~0.76)
+    - 眉の曲率  : 0.00〜0.022を 0〜1 にマップ
+    """
+    categories = ["縦横比\n(面長↑)", "目の大きさ", "目の丸み", "顎の鋭さ\n(シャープ↑)", "輪郭の丸み", "眉の曲率\n(アーチ↑)"]
     values = [
-        min(max((metrics.aspect_ratio    - 1.10) / 0.50, 0.0), 1.0),
-        min(max((metrics.eye_width_ratio - 0.18) / 0.12, 0.0), 1.0),
-        min(max((metrics.eye_roundness   - 0.15) / 0.30, 0.0), 1.0),
-        min(max((140 - metrics.jaw_angle)         / 40,  0.0), 1.0),
-        min(max(metrics.face_roundness,                  0.0), 1.0),
-        min(max(metrics.eyebrow_curvature          / 0.02, 0.0), 1.0),
+        min(max((metrics.aspect_ratio    - 1.25) / 0.30, 0.0), 1.0),
+        min(max((metrics.eye_width_ratio - 0.15) / 0.12, 0.0), 1.0),
+        min(max((metrics.eye_roundness   - 0.14) / 0.24, 0.0), 1.0),
+        min(max((132 - metrics.jaw_angle)         / 20,  0.0), 1.0),  # 逆スケール: 小=シャープ
+        min(max((metrics.face_roundness  - 0.60) / 0.30, 0.0), 1.0),
+        min(max(metrics.eyebrow_curvature          / 0.022, 0.0), 1.0),
     ]
     values.append(values[0])
     categories.append(categories[0])

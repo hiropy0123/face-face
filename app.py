@@ -31,7 +31,7 @@ from src.similarity import FaceDetection, SimilarityResult, compute_similarity, 
 
 MAX_LONG_SIDE = 2000
 
-st.set_page_config(page_title="顔分析アプリ", page_icon="🙂", layout="wide")
+st.set_page_config(page_title="顔分析アプリ", page_icon="😊", layout="wide")
 
 
 # ---------------------------------------------------------------------------
@@ -283,23 +283,55 @@ def tab_similarity() -> None:
 # タブ 3: 顔タイプ診断
 # ---------------------------------------------------------------------------
 
+# 日本人統計基準値（出典: 産業技術総合研究所DB2001・花王研究・顎形態統計研究）
+_JP_STATS: list[tuple[str, float, float, str, str]] = [
+    # (特徴名,  日本人平均値,  標準偏差相当,  幼顔方向,  大人/直線方向)
+    ("顔の縦横比",   1.39, 0.08, "< 1.30 = 丸顔(幼顔)",  "> 1.42 = 面長(大人顔)"),
+    ("目の縦位置",   0.43, 0.03, "< 0.40 = 目が下寄り(幼顔)", "> 0.45 = 目が上寄り(大人顔)"),
+    ("目幅比",       0.20, 0.03, "> 0.23 = 大きな目(幼顔)", "< 0.18 = 小さめの目(大人顔)"),
+    ("目の丸み",     0.24, 0.05, "> 0.30 = 丸い目(幼/曲線)", "< 0.20 = 細い目(大人/直線)"),
+    ("鼻の長さ比",   0.27, 0.04, "< 0.23 = 短い鼻(幼顔)",  "> 0.30 = 長い鼻(大人顔)"),
+    ("鼻の幅比",     0.30, 0.04, "─",                       "> 0.36 = 広い鼻(曲線系)"),
+    ("口幅比",       0.43, 0.04, "─",                       "─"),
+    ("下顔面比",     0.50, 0.05, "< 0.47 = 小さい顎(幼顔)", "> 0.53 = 長い下顔面(大人顔)"),
+    ("顎の角度(°)", 120,  6,    "> 126 = 丸い顎(曲線系)",  "< 114 = シャープ(直線系)"),
+    ("顔の丸み",     0.76, 0.08, "> 0.82 = 丸顔(曲線系)",   "< 0.67 = 細面(直線系)"),
+    ("眉の曲率",     0.011, 0.005, "> 0.016 = アーチ(曲線)", "< 0.007 = フラット(直線)"),
+]
+
+
 def _render_metrics_table(m) -> None:
-    rows = [
-        ("顔の縦横比",   m.aspect_ratio,        "高い=面長、低い=丸顔"),
-        ("目の縦位置",   m.eye_position_ratio,   "低い=目が顔の上寄り"),
-        ("目幅比",       m.eye_width_ratio,      "大きい=大きな目"),
-        ("目の丸み",     m.eye_roundness,        "大きい=丸い目"),
-        ("鼻の長さ比",   m.nose_length_ratio,    "大きい=長い鼻"),
-        ("鼻の幅比",     m.nose_width_ratio,     "大きい=広い鼻"),
-        ("口幅比",       m.mouth_width_ratio,    "大きい=広い口"),
-        ("下顔面比",     m.lower_face_ratio,     "大きい=鼻〜顎が長い"),
-        ("顎の角度 (°)", m.jaw_angle,            "小さい=シャープ、大きい=丸み"),
-        ("顔の丸み",     m.face_roundness,       "1.0 に近いほど丸顔"),
-        ("眉の曲率",     m.eyebrow_curvature,    "大きい=アーチ型眉"),
+    """計測値を日本人統計基準と比較して表示する."""
+    attr_map = [
+        ("顔の縦横比",   m.aspect_ratio),
+        ("目の縦位置",   m.eye_position_ratio),
+        ("目幅比",       m.eye_width_ratio),
+        ("目の丸み",     m.eye_roundness),
+        ("鼻の長さ比",   m.nose_length_ratio),
+        ("鼻の幅比",     m.nose_width_ratio),
+        ("口幅比",       m.mouth_width_ratio),
+        ("下顔面比",     m.lower_face_ratio),
+        ("顎の角度(°)", m.jaw_angle),
+        ("顔の丸み",     m.face_roundness),
+        ("眉の曲率",     m.eyebrow_curvature),
     ]
-    df = pd.DataFrame(rows, columns=["特徴", "値", "解説"])
-    df["値"] = df["値"].apply(lambda v: round(float(v), 4))
-    st.dataframe(df, hide_index=True)
+    stats_dict = {row[0]: row for row in _JP_STATS}
+    rows = []
+    for name, val in attr_map:
+        stat = stats_dict.get(name)
+        if stat:
+            _, avg, sd, youthward, adultward = stat
+            diff = val - avg
+            diff_str = f"{diff:+.4f}" if name != "顎の角度(°)" else f"{diff:+.1f}"
+            rows.append({
+                "特徴": name,
+                "あなたの値": round(float(val), 4) if name != "顎の角度(°)" else round(float(val), 1),
+                "日本人平均": avg,
+                "差分": diff_str,
+                "幼顔/曲線方向": youthward,
+                "大人/直線方向": adultward,
+            })
+    st.dataframe(pd.DataFrame(rows), hide_index=True)
 
 
 def tab_face_type() -> None:
