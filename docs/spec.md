@@ -54,10 +54,11 @@
 ## 5. 非機能要件
 | 項目 | 要件 |
 |---|---|
-| 起動時間 | Streamlit Cloud 上で初回 60 秒以内(モデル初回ダウンロード含む) |
+| 起動時間 | HF Spaces 上で初回 3 分以内(DeepFace モデル ~1.6GB のダウンロード含む) |
 | 推論時間 | 顔 1 つあたり CPU で 5 秒以内 |
-| メモリ | ピーク 900MB 以下(Streamlit Cloud 1GB 制限内) |
-| 可用性 | Streamlit Community Cloud の SLA に準ずる |
+| メモリ | ピーク 4GB 以下(HF Spaces CPU Basic = 16GB RAM 内) |
+| 可用性 | Hugging Face Spaces の SLA に準ずる |
+| デプロイ先 | Hugging Face Spaces(Streamlit SDK / CPU basic free)。Streamlit Community Cloud は 1GB メモリ制限のため使用不可 |
 | セキュリティ | アップロード画像はサーバ側に永続化しない(メモリ上のみ) |
 
 ## 6. アーキテクチャ

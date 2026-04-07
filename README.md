@@ -1,3 +1,15 @@
+---
+title: Face Face
+emoji: 🙂
+colorFrom: green
+colorTo: blue
+sdk: streamlit
+sdk_version: 1.39.0
+app_file: app.py
+pinned: false
+license: mit
+---
+
 # face-face
 
 顔写真から **年齢 / 性別 / 人種カテゴリ** を統計的に推定する Streamlit アプリケーションです。
@@ -23,9 +35,9 @@
 | 推論モデル | DeepFace(age / gender / race の事前学習モデル) |
 | 顔検出器 | OpenCV(`opencv-python-headless`)+ DeepFace 内蔵 detector |
 | 画像処理 | Pillow / NumPy |
-| デプロイ | Streamlit Community Cloud(Python 3.11) |
+| デプロイ | **Hugging Face Spaces**(Streamlit SDK / CPU Basic / 16GB RAM) |
 
-> Streamlit Cloud のメモリ制約(約 1GB)に収まるよう、TensorFlow CPU 版を使用し、不要な GPU 依存は持ち込みません。
+> 当初 Streamlit Community Cloud を想定していましたが、DeepFace の age/gender/race モデル(各 ~537MB、合計 ~1.6GB)が Cloud の 1GB メモリ制限に収まらないため、Hugging Face Spaces(CPU Basic 無料枠 16GB RAM)に変更しました。
 
 ## ディレクトリ構成(予定)
 
@@ -58,12 +70,21 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## デプロイ手順(Streamlit Community Cloud)
+## デプロイ手順(Hugging Face Spaces)
 
-1. GitHub リポジトリを作成し本リポジトリを push
-2. https://share.streamlit.io/ から New app
-3. リポジトリ / ブランチ / `app.py` を指定
-4. Python version は `runtime.txt` の `python-3.11` が自動採用される
+1. https://huggingface.co/new-space で新しい Space を作成
+   - **SDK**: Streamlit
+   - **Hardware**: CPU basic (free)
+   - 公開/非公開を選択
+2. 作成された Space の git リポジトリに本リポジトリの内容を push
+   ```bash
+   git remote add space https://huggingface.co/spaces/<your-username>/face-face
+   git push space main
+   ```
+3. Space が自動でビルド・起動します(初回は DeepFace モデルのダウンロードに数分)
+4. 設定は本 README 冒頭の YAML frontmatter で管理(`sdk`, `sdk_version`, `app_file` 等)
+
+> 📝 `packages.txt` の apt 依存(`libgl1`, `libglib2.0-0t64`)は HF Spaces でもそのまま有効です。
 
 ## 仕様書
 
