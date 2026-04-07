@@ -51,7 +51,7 @@ def render_face_detail(idx: int, image_rgb: np.ndarray, face: FaceResult) -> Non
         with cols[0]:
             thumb = crop_face(image_rgb, face)
             if thumb.size > 0:
-                st.image(thumb, caption=f"#{idx}", use_container_width=True)
+                st.image(thumb, caption=f"#{idx}", use_column_width=True)
         with cols[1]:
             st.markdown(f"### 顔 #{idx}")
             st.markdown(f"- **推定年齢**: {face.age} 歳")
@@ -72,7 +72,7 @@ def render_face_detail(idx: int, image_rgb: np.ndarray, face: FaceResult) -> Non
                     ]
                 ).sort_values("確率(%)", ascending=False)
                 st.markdown("**人種カテゴリの確率分布**")
-                st.dataframe(df, hide_index=True, use_container_width=True)
+                st.dataframe(df, hide_index=True)
                 st.bar_chart(df.set_index("カテゴリ")["確率(%)"])
 
 
@@ -115,13 +115,13 @@ def main() -> None:
 
     if not faces:
         st.warning("顔を検出できませんでした。別の画像をお試しください。")
-        st.image(image_rgb, caption="アップロード画像", use_container_width=True)
+        st.image(image_rgb, caption="アップロード画像", use_column_width=True)
         st.stop()
 
     annotated = draw_faces(image_rgb, faces)
 
     st.subheader(f"検出結果 — {len(faces)} 人の顔を検出")
-    st.image(annotated, caption="検出結果", use_container_width=True)
+    st.image(annotated, caption="検出結果", use_column_width=True)
 
     st.subheader("顔ごとの詳細")
     for idx, face in enumerate(faces, start=1):
