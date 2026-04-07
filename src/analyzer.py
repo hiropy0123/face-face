@@ -55,7 +55,7 @@ def analyze_image(image_rgb: np.ndarray) -> list[FaceResult]:
     results = DeepFace.analyze(
         img_path=image_bgr,
         actions=["age", "gender", "race"],
-        detector_backend="opencv",
+        detector_backend="retinaface",
         enforce_detection=False,
         silent=True,
     )
