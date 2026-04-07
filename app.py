@@ -8,7 +8,7 @@ import pandas as pd
 import streamlit as st
 from PIL import Image, ImageOps
 
-from src.analyzer import FaceResult, analyze_image
+from src.analyzer import FaceResult, analyze_image, init_insightface
 from src.drawing import crop_face, draw_faces
 from src.i18n import gender_ja, race_ja
 
@@ -26,6 +26,10 @@ def warmup_models() -> bool:
         analyze_image(dummy)
     except Exception:
         # 顔が検出されないのは想定内
+        pass
+    try:
+        init_insightface()
+    except Exception:
         pass
     return True
 
