@@ -1,6 +1,11 @@
 """顔分析アプリ — Streamlit エントリーポイント."""
 from __future__ import annotations
 
+import os
+# DeepFace (0.0.93) は Keras 2 API を使用するため、TF 2.17+ で Keras 3 が
+# デフォルトになる前に tf-keras (レガシー互換) を強制する。
+os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
+
 import io
 
 import matplotlib.patches as mpatches
