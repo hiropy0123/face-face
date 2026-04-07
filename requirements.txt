@@ -9,3 +9,4 @@ numpy==1.26.4
 pandas==2.2.3
 insightface==0.7.3
 onnxruntime==1.19.2
+mediapipe>=0.10.14
